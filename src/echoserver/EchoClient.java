@@ -6,24 +6,20 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class EchoClient {
-	public static final int PORT_NUMBER = 6014;
-	public static Socket socket;
+	public static final int PORT_NUMBER = 6013;
 
 	public static void main(String[] args) throws IOException {
 		EchoClient client = new EchoClient();
-		socket = new Socket("localhost", PORT_NUMBER);
 		client.start();
 	}
 
 	private void start() throws IOException {
 		try {
+			Socket socket = new Socket("localhost", PORT_NUMBER);
 			inputThread inputThread = new inputThread(socket);
 			outputThread outputThread = new outputThread(socket);
 			inputThread.start();
 			outputThread.start();
-			System.out.flush();
-			socket.shutdownOutput();
-			socket.close();
 		} catch (IOException e) {
 			System.out.println("thread creation failed.");
 		}
@@ -45,13 +41,17 @@ class inputThread extends Thread{
 	 }
 
 	 public void run() { 
-		 try{
+		 try{	
 			InputStream socketInputStream = socket.getInputStream();
-			int readByte;
-			while((readByte = System.in.read()) != -1){
-				int socketByte = socketInputStream.read();
-				System.out.write(socketByte);
+			OutputStream socketOutputStream = socket.getOutputStream();
+			int socketByte;
+			while((socketByte = socketInputStream.read()) != -1){
+				System.out.write((byte) socketByte);
 			}
+			System.out.flush();
+			socketOutputStream.flush();
+			socket.close();
+	
 		 } catch (IOException e) {
 			 System.out.println("inputThread Exception");
 		 }
@@ -72,17 +72,17 @@ class outputThread extends Thread{
 	}
 
          public void run() {
-                 try{
-                        OutputStream socketOutputStream = socket.getOutputStream();
+                 try{   
+	                OutputStream socketOutputStream = socket.getOutputStream();
 			int readByte;
 			while((readByte = System.in.read()) != -1){
-				socketOutputStream.write(readByte);
+				socketOutputStream.write((byte) readByte);
 			}
+			System.out.flush();
 			socketOutputStream.flush();
 			socket.shutdownOutput();
                  } catch (IOException e){
                          System.out.println("outputThread Exception");
                  }
 	 }
-
 }

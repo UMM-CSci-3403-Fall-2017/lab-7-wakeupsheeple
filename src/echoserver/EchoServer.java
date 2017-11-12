@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class EchoServer {
-	public static final int PORT_NUMBER = 6014;
+	public static final int PORT_NUMBER = 6013;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		EchoServer server = new EchoServer();
@@ -23,7 +23,6 @@ public class EchoServer {
 			}
 		} catch(IOException e) {
 			System.out.println("ServerSocket creation failed"); 
-
 		}
 	}
 }
@@ -50,6 +49,9 @@ class multiThread extends Thread {
 			while((b = inputStream.read()) != -1){
 				outputStream.write(b);
 			}
+			System.out.flush();
+			outputStream.flush();
+			socket.close();
 		} catch (IOException e){
 			System.out.println("run exception");
 		}

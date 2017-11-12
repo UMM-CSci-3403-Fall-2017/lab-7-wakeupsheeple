@@ -10,11 +10,13 @@ public class EchoServer {
 	public static final int PORT_NUMBER = 6013;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
+		//create and start server	
 		EchoServer server = new EchoServer();
 		server.start();
 	}
 
 	private void start() throws IOException, InterruptedException {	
+		//open server socket and create thread for accepted connection
 		try(ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)){				
 			System.out.println("listening...");
 			while (true) {	
@@ -28,11 +30,13 @@ public class EchoServer {
 }
 
 class multiThread extends Thread {
+	//initialize vars
 	private Thread thread;
 	private Socket socket;
 
 	multiThread(ServerSocket s){
-		try{
+		try{	
+			//accept connection
 			System.out.println("Thread created...");
 			socket = s.accept();
 		} catch (IOException e){
@@ -43,12 +47,14 @@ class multiThread extends Thread {
 
 	public void run(){
 		try{
+			//open streams and write bytes from input to output
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			int b;
 			while((b = inputStream.read()) != -1){
 				outputStream.write(b);
 			}
+			//flush streams and close socket due to end of input
 			System.out.flush();
 			outputStream.flush();
 			socket.close();
@@ -58,6 +64,7 @@ class multiThread extends Thread {
 	}
 
 	public void start(){
+		//thread constructor
 		thread = new Thread(this);
 		thread.start();
 	}

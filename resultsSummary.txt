@@ -1,0 +1,7 @@
+After utilizing the automated process generating bash script, we found that the runtime was dependent on
+the number of available threads vs how many clients were connecting to the server. We tried both an 
+unbounded cached thread pool and a fixed thread pool (that we varied the pool size of). When throwing 
+large numbers of clients at the thread pool the runtime seemed to drastically increase once the fixed 
+number of threads were in use. Varying the pool size and the number of clients seemed to present a 
+somewhat vague relationship in that there seems to be a point at which having too many threads available
+to handle connections is less efficient than using a smaller thread pool that recycles threads to be used again once freed. This inconsistancy was hard to properly analyze as some of this slowdown could have beendue to background processes running on the computer.

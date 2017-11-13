@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class EchoServer {
 	public static final int PORT_NUMBER = 6013;
@@ -16,13 +18,19 @@ public class EchoServer {
 	}
 
 	private void start() throws IOException, InterruptedException {	
+		//implement thread pool to cap the number of concurrent connections possible
+		ExecutorService pool = Executors.newCachedThreadPool();	
 		//open server socket and create thread for accepted connection
 		try(ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)){				
 			System.out.println("listening...");
 			while (true) {	
 				multiThread m = new multiThread(serverSocket);
-			        m.start();	
-			}
+				//stagger and execute threads
+				m.sleep(50);
+				pool.execute(m);
+					
+			}       
+			
 		} catch(IOException e) {
 			System.out.println("ServerSocket creation failed"); 
 		}
@@ -64,8 +72,12 @@ class multiThread extends Thread {
 	}
 
 	public void start(){
-		//thread constructor
-		thread = new Thread(this);
-		thread.start();
+		try{
+			//thread constructor
+			thread = new Thread(this);
+			thread.start();
+		} catch (Exception e) {
+			System.out.println(e);
+		}	
 	}
 }
